@@ -1,4 +1,5 @@
-const API_BASE = '/api';
+const RAW_API_URL = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, '');
+const API_BASE = RAW_API_URL ? `${RAW_API_URL}/api` : '/api';
 
 // Helper generico per gestire la risposta HTTP ed estrarre l'errore del backend
 async function handleResponse(res, fallbackErrorMsg) {
@@ -9,10 +10,10 @@ async function handleResponse(res, fallbackErrorMsg) {
     } catch {
       // Se la risposta non è un JSON valido
     }
-    const message = errorData?.error 
+    const message = errorData?.error
       ? (errorData.details ? `${errorData.error}: ${errorData.details}` : errorData.error)
       : (errorData?.message || fallbackErrorMsg);
-      
+
     throw new Error(message);
   }
 
@@ -70,10 +71,13 @@ export async function createProduct(data) {
 }
 
 export async function updateProduct(id, data) {
+  // Rimuove eventuali campi read-only (status) rifiutati con 400 dal backend
+  const { status, ...safePayload } = data;
+
   const res = await fetch(`${API_BASE}/products/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify(safePayload),
   });
   return handleResponse(res, "Errore durante l'aggiornamento del prodotto");
 }
