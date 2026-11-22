@@ -197,3 +197,7 @@ npm audit
 
 - **Automated Integration Testing**  
   Test suite covering rendering, user workflows, disabled states, and race-condition handling.
+
+## 📄 License
+
+This project is released under the MIT License.
